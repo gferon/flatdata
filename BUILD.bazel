@@ -1,0 +1,36 @@
+# TODO: pyparsing and jinja2 are dependencies of the generator
+
+py_library(
+    name = "generator-lib",
+    srcs = glob(["flatdata-generator/flatdata/generator/**/*.py"]),
+    imports = ["flatdata-generator"],
+    srcs_version = "PY3",
+)
+
+py_binary(
+    name = "generator",
+    srcs = ["flatdata-generator/generator.py"],
+    data = glob(["flatdata-generator/templates/**/*"]),
+    legacy_create_init = False,  # important to not alter packages structure with the launcher
+    python_version = "PY3",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":generator-lib",
+    ],
+)
+
+cc_library(
+    name = "cpp",
+    srcs = glob(["flatdata-cpp/src/*.cpp"]),
+    hdrs = glob([
+        "flatdata-cpp/include/**/*.h",
+        "flatdata-cpp/include/**/*.inl",
+    ]),
+    linkstatic = True,
+    strip_include_prefix = "flatdata-cpp/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@boost//:filesystem",
+        "@boost//:system",
+    ],
+)
